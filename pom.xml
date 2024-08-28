@@ -14,10 +14,6 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <jersey-version>2.27</jersey-version>
-        <tomcat.url>${env.TOMCAT_URL}</tomcat.url>
-        <tomcat.username>${env.TOMCAT_PASSWORD}</tomcat.username>
-        <tomcat.password>${env.TOMCAT_USERNAME}</tomcat.password>
-        <tomcat.path>${env.TOMCAT_PATH}</tomcat.path>
     </properties>
 
     <scm>
@@ -27,6 +23,18 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://localhost:8081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -98,20 +106,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.tomcat.maven</groupId>
-            <artifactId>tomcat10-maven-plugin</artifactId>
-            <version>2.2</version>
-            <configuration>
-                <url>http://13.127.47.232:8080/manager/text</url>
-                <server>maven-tomcat-war-deployment-server</server>
-                <path>/your-app-context</path>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.2.2</version>
@@ -194,65 +188,32 @@
             </plugin>
 
              <plugin>
-                 <groupId>org.codehaus.cargo</groupId>
-                 <artifactId>cargo-maven2-plugin</artifactId>
-                 <version>1.7.16</version>
-                 <configuration>
-                     <container>
-                         <containerId>tomcat10x</containerId>
-                         <type>remote</type>
-                     </container>
-                     <configuration>
-                         <type>runtime</type>
-                         <properties>
-                             <cargo.remote.username>${tomcat.username}</cargo.remote.username>
-                             <cargo.remote.password>${tomcat.password}</cargo.remote.password>
-                             <cargo.remote.uri>${tomcat.url}</cargo.remote.uri>
-                         </properties>
-                     </configuration>
-                     <deployables>
-                         <deployable>
-                             <groupId>${project.groupId}</groupId>
-                             <artifactId>${project.artifactId}</artifactId>
-                             <type>war</type>
-                             <properties>
-                                 <context>${tomcat.path}</context>
-                             </properties>
-                         </deployable>
-                     </deployables>
-                 </configuration>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.6.9</version>
+                <configuration>
+                    <container>
+                        <containerId>tomcat8x</containerId>
+                        <home>/usr/local/apache-tomcat-8.5.82/</home>
+                    </container>
+                    <configuration>
+                        <type>existing</type>
+                        <home>/usr/local/apache-tomcat-8.5.82/</home>
+                    </configuration>
+                </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.0.0-M1</version> <!-- Use the appropriate version -->
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-                        
-           <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.0.0-M1</version> <!-- Use the appropriate version -->
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <url>${tomcat.url}</url>
-                    <username>${tomcat.username}</username>
-                    <password>${tomcat.password}</password>
-                    <path>${tomcat.path}</path>
-                    <timeout>60000</timeout>
+                    <url>http://3.6.89.223:8080/manager/text</url>
+                    <server>tomcat</server>
+                    <username>manager</username>
+                    <password>password</password>
+                    <path>/calculator</path>
                     <update>true</update>
-                    <warFile>${project.build.directory}/${project.build.finalName}.war</warFile>
                 </configuration>
             </plugin>
 
@@ -268,17 +229,7 @@
                             <goal>jmeter</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>configuration</id>
-                        <goals>
-                            <goal>configure</goal>
-                        </goals>
-                    </execution>
                 </executions>
-                 <configuration>
-                    <!-- Other configurations -->
-                    <testFilesDirectory>./src/test/jmeter</testFilesDirectory>
-                </configuration>
             </plugin>
             
             <plugin>
@@ -286,6 +237,18 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.7.1</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <username>username</username>
+                    <password>password</password>
+                    <tagBase>https://github.com/maping/java-maven-calculator-web-app.git</tagBase>
+                    <branchBase>https://github.com/maping/java-maven-calculator-web-app.git</branchBase>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
